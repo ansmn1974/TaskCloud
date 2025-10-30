@@ -35,25 +35,13 @@ class ThrottledSwaggerView(SpectacularSwaggerView):
     throttle_scope = 'docs'
     
     def get(self, request, *args, **kwargs):
-        """Adjust schema URL to include any path prefix used by the reverse proxy.
+        """Point the UI to a path-relative schema URL.
 
-        When the app is hosted under a sub-path (e.g., "/tasks"), the default
-        absolute schema URL ("/api/schema/") used by the Swagger UI won't include
-        that prefix, causing the browser to request the wrong URL.
-
-        We derive the prefix directly from the current request path by stripping
-        the trailing route ("/api/docs/") and preprend it to the schema URL.
-        This keeps local/dev (no prefix) and production (with prefix) working
-        without additional environment variables or proxy header tweaks.
+        Using a relative path like "../schema/" makes the browser resolve it
+        correctly whether the app is mounted at the domain root ("/api/docs/")
+        or under a proxy prefix (e.g., "/tasks/api/docs/").
         """
-        path = request.path
-        prefix = ''
-        if path.endswith('/api/docs/'):
-            prefix = path[:-len('/api/docs/')]
-        # Ensure leading slash is present (it will be for request.path)
-        schema_path = f"{prefix}/api/schema/"
-        # Override the URL used by the embedded UI
-        self.url = schema_path
+        self.url = '../schema/'
         return super().get(request, *args, **kwargs)
 
 
@@ -62,13 +50,8 @@ class ThrottledRedocView(SpectacularRedocView):
     throttle_scope = 'docs'
     
     def get(self, request, *args, **kwargs):
-        """Same dynamic prefixing logic as ThrottledSwaggerView."""
-        path = request.path
-        prefix = ''
-        if path.endswith('/api/redoc/'):
-            prefix = path[:-len('/api/redoc/')]
-        schema_path = f"{prefix}/api/schema/"
-        self.url = schema_path
+        """Use a path-relative schema URL so reverse proxy prefixes are honored."""
+        self.url = '../schema/'
         return super().get(request, *args, **kwargs)
 
 urlpatterns = [
