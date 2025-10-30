@@ -16,11 +16,11 @@ class ApiService {
           .get(Uri.parse(ApiConfig.tasksUrl))
           .timeout(ApiConfig.timeout);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => Task.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load tasks: ${response.statusCode}');
+        throw Exception('Failed to load tasks: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
       throw Exception('Failed to fetch tasks: $e');
@@ -38,10 +38,18 @@ class ApiService {
           )
           .timeout(ApiConfig.timeout);
 
-      if (response.statusCode == 201) {
-        return Task.fromJson(json.decode(response.body));
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // Prefer parsing the server response, but fallback to the optimistic task
+        try {
+          if (response.body.isNotEmpty) {
+            return Task.fromJson(json.decode(response.body));
+          }
+        } catch (_) {
+          // Ignore parse errors on successful status codes
+        }
+        return task;
       } else {
-        throw Exception('Failed to create task: ${response.statusCode}');
+        throw Exception('Failed to create task: ${response.statusCode} ${response.reasonPhrase} ${response.body}');
       }
     } catch (e) {
       throw Exception('Failed to create task: $e');
@@ -59,10 +67,15 @@ class ApiService {
           )
           .timeout(ApiConfig.timeout);
 
-      if (response.statusCode == 200) {
-        return Task.fromJson(json.decode(response.body));
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        try {
+          if (response.body.isNotEmpty) {
+            return Task.fromJson(json.decode(response.body));
+          }
+        } catch (_) {}
+        return task; // fallback to our updated object
       } else {
-        throw Exception('Failed to update task: ${response.statusCode}');
+        throw Exception('Failed to update task: ${response.statusCode} ${response.reasonPhrase} ${response.body}');
       }
     } catch (e) {
       throw Exception('Failed to update task: $e');
@@ -76,8 +89,8 @@ class ApiService {
           .delete(Uri.parse(ApiConfig.taskDetailUrl(taskId)))
           .timeout(ApiConfig.timeout);
 
-      if (response.statusCode != 204) {
-        throw Exception('Failed to delete task: ${response.statusCode}');
+      if (response.statusCode != 204 && response.statusCode != 200) {
+        throw Exception('Failed to delete task: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
       throw Exception('Failed to delete task: $e');
