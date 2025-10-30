@@ -99,7 +99,9 @@ class TaskProvider extends ChangeNotifier {
         _tasks[idx] = createdTask;
         await _save();
       }
-      // Don't change connection status - maintain current state
+      // Mark connection healthy on any successful call
+      _isOnline = true;
+      _error = null;
       if (kDebugMode) {
         print('Task created successfully on server: ${createdTask.id}');
       }
@@ -109,11 +111,9 @@ class TaskProvider extends ChangeNotifier {
         print('Failed to sync task to server: $e');
       }
       // Only set offline if we weren't already offline
-      if (_isOnline) {
-        _isOnline = false;
-        _error = 'Task saved locally. Will sync when online.';
-        notifyListeners();
-      }
+      _isOnline = false;
+      _error = 'Task saved locally. Will sync when online.';
+      notifyListeners();
     }
   }
 
@@ -132,6 +132,8 @@ class TaskProvider extends ChangeNotifier {
       final serverTask = await _api.updateTask(_tasks[idx]);
       _tasks[idx] = serverTask;
       await _save();
+      _isOnline = true;
+      _error = null;
       if (kDebugMode) {
         print('Task updated successfully on server: ${serverTask.id}');
       }
@@ -140,11 +142,9 @@ class TaskProvider extends ChangeNotifier {
       if (kDebugMode) {
         print('Failed to sync task update to server: $e');
       }
-      if (_isOnline) {
-        _isOnline = false;
-        _error = 'Changes saved locally. Will sync when online.';
-        notifyListeners();
-      }
+      _isOnline = false;
+      _error = 'Changes saved locally. Will sync when online.';
+      notifyListeners();
     }
   }
 
@@ -166,6 +166,8 @@ class TaskProvider extends ChangeNotifier {
       final serverTask = await _api.updateTask(updated);
       _tasks[idx] = serverTask;
       await _save();
+      _isOnline = true;
+      _error = null;
       if (kDebugMode) {
         print('Task toggle synced successfully: ${serverTask.id}');
       }
@@ -174,11 +176,9 @@ class TaskProvider extends ChangeNotifier {
       if (kDebugMode) {
         print('Failed to sync task toggle to server: $e');
       }
-      if (_isOnline) {
-        _isOnline = false;
-        _error = 'Changes saved locally. Will sync when online.';
-        notifyListeners();
-      }
+      _isOnline = false;
+      _error = 'Changes saved locally. Will sync when online.';
+      notifyListeners();
     }
   }
 
@@ -188,21 +188,22 @@ class TaskProvider extends ChangeNotifier {
     if (idx == -1) return;
 
     // Optimistic delete
-    final deletedTask = _tasks.removeAt(idx);
+    _tasks.removeAt(idx);
+    await _save();
     notifyListeners();
 
     try {
       // Sync with API
       await _api.deleteTask(id);
-      await _save();
       _isOnline = true;
       _error = null;
     } catch (e) {
-      // Rollback on failure
-      _tasks.insert(idx, deletedTask);
+      // Keep local deletion; will sync later
+      if (kDebugMode) {
+        print('Failed to sync task delete to server: $e');
+      }
       _isOnline = false;
-      _error = 'Failed to delete task. Try again.';
-      await _save();
+      _error = 'Changes saved locally. Will sync when online.';
     }
     notifyListeners();
   }
