@@ -1,49 +1,48 @@
 version: "3.9"
 
 services:
-  taskcloud:
-    build:
-      context: ..
-      dockerfile: backend/Dockerfile
-    image: taskcloud-backend:latest
-    container_name: taskcloud-backend
-    env_file:
-      - .env
-    networks:
-      - taskcloud_net
-    ports:
-      - "8080:8080"   # Behind existing reverse proxy (recommended on a shared VPS)
-    volumes:
-      - caddy_data:/data       # Caddy cert storage
-      - caddy_config:/config   # Caddy config storage
-    restart: unless-stopped
-    # Uncomment if using the bundled Postgres service below
-    # depends_on:
-    #   - postgres
-
-  # Optional Postgres service (enable if you want in-container DB)
-  # Be mindful of other containers on your VPS; ensure port and network don't conflict.
   postgres:
     image: postgres:16
     container_name: taskcloud-postgres
     environment:
-      - POSTGRES_DB=taskcloud
-      - POSTGRES_USER=taskcloud
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-me-in-production}
+      POSTGRES_DB: ${POSTGRES_DB:-taskcloud}
+      POSTGRES_USER: ${POSTGRES_USER:-taskcloud}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - taskcloud_net
     restart: unless-stopped
-    # Expose only if you need to connect from host; otherwise omit
-    # ports:
-    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskcloud}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  taskcloud:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: taskcloud-backend:latest
+    container_name: taskcloud-backend
+    env_file:
+      - .env
+    environment:
+      # Override with postgres container connection
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - taskcloud_net
+    ports:
+      - "127.0.0.1:8000:8000"  # Bind to localhost only, Caddy will proxy
+    restart: unless-stopped
 
 networks:
   taskcloud_net:
     name: taskcloud_net
 
 volumes:
-  caddy_data:
-  caddy_config:
   pgdata:

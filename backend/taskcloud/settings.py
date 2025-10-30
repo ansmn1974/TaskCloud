@@ -32,8 +32,12 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
 
 ALLOWED_HOSTS = (
     os.environ.get('DJANGO_ALLOWED_HOSTS', '')
-    .split(',') if os.environ.get('DJANGO_ALLOWED_HOSTS') else []
+    .split(',') if os.environ.get('DJANGO_ALLOWED_HOSTS') else ['localhost', '127.0.0.1']
 )
+
+# Trust proxy headers from Caddy reverse proxy
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -172,11 +176,19 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
 }
 
-# CORS settings for local development (Flutter app on different port)
+# CORS settings for production and local development
 CORS_ALLOWED_ORIGINS = [
+    'https://ibn-nabil.com',
+    'http://ibn-nabil.com',
     'http://localhost:3000',
     'http://localhost:5000',
     'http://localhost:8080',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF settings for production
+CSRF_TRUSTED_ORIGINS = [
+    'https://api.ibn-nabil.com',
+    'https://ibn-nabil.com',
+]

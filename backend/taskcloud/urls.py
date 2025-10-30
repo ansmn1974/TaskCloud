@@ -22,6 +22,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+from .health import health_check
 
 
 class ThrottledSchemaView(SpectacularAPIView):
@@ -39,6 +40,7 @@ class ThrottledRedocView(SpectacularRedocView):
     throttle_scope = 'docs'
 
 urlpatterns = [
+    path('health/', health_check, name='health'),
     path('admin/', admin.site.urls),
     path('api/tasks/', include('tasks.urls')),
     # API documentation
