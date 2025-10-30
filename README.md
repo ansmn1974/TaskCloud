@@ -98,9 +98,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-**Developer**: Your Name  
-**Website**: [ibn-nabil.com](https://ibn-nabil.com)  
-**Email**: your.email@ibn-nabil.com
+**Website**: [ibn-nabil.com](https://ibn-nabil.com)
 
 ---
 
