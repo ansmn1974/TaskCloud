@@ -180,9 +180,12 @@ SPECTACULAR_SETTINGS = {
 CORS_ALLOWED_ORIGINS = [
     'https://ibn-nabil.com',
     'http://ibn-nabil.com',
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'http://localhost:8080',
+]
+
+# Allow all localhost origins in development
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
