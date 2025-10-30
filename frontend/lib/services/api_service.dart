@@ -74,6 +74,10 @@ class ApiService {
           }
         } catch (_) {}
         return task; // fallback to our updated object
+      } else if (response.statusCode == 404) {
+        // The server doesn't have this task (likely expired/cleaned up).
+        // Fallback to creating it as a new record to re-sync.
+        return await createTask(task);
       } else {
         throw Exception('Failed to update task: ${response.statusCode} ${response.reasonPhrase} ${response.body}');
       }
@@ -89,7 +93,7 @@ class ApiService {
           .delete(Uri.parse(ApiConfig.taskDetailUrl(taskId)))
           .timeout(ApiConfig.timeout);
 
-      if (response.statusCode != 204 && response.statusCode != 200) {
+      if (response.statusCode != 204 && response.statusCode != 200 && response.statusCode != 404) {
         throw Exception('Failed to delete task: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
