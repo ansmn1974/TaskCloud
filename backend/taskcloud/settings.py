@@ -174,6 +174,19 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
+    # Help Swagger/ReDoc "Try it out" resolve the correct base path when
+    # the app is served under a reverse-proxy prefix (e.g., "/tasks").
+    # Users can switch servers in the UI if needed.
+    'SERVERS': [
+        {
+            'url': '/tasks',
+            'description': 'Production via Caddy (/tasks)'
+        },
+        {
+            'url': '/',
+            'description': 'Local development (no prefix)'
+        },
+    ],
 }
 
 # CORS settings for production and local development
