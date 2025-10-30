@@ -72,6 +72,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('TaskCloud'),
         actions: [
+          // Connection status indicator
+          if (provider.error != null)
+            Tooltip(
+              message: provider.error!,
+              child: Icon(
+                provider.isOnline ? Icons.cloud_done : Icons.cloud_off,
+                color: provider.isOnline ? Colors.green : Colors.orange,
+              ),
+            ),
+          const SizedBox(width: 8),
           _ThemeMenuButton(),
         ],
       ),
