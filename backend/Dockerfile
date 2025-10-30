@@ -7,9 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-# System deps (including PostgreSQL client for psycopg2)
+# System deps (including PostgreSQL client for psycopg2 and netcat for health checks)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl ca-certificates build-essential libpq-dev \
+    curl ca-certificates build-essential libpq-dev netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
