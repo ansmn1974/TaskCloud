@@ -79,22 +79,35 @@ class Task extends Equatable {
   /// 
   /// Throws [FormatException] if date strings are invalid.
   factory Task.fromJson(Map<String, dynamic> json) {
+    // Accept both camelCase (local storage) and snake_case (API) keys
+    T? _get<T>(String camel, String snake) {
+      final v = json.containsKey(camel) ? json[camel] : json[snake];
+      return v is T ? v : null;
+    }
+
+    final String id = (json['id'] ?? '') as String;
+    final String title = (json['title'] ?? '') as String;
+    final String? description = _get<String>('description', 'description');
+    final bool isCompleted = (_get<bool>('isCompleted', 'is_completed')) ?? false;
+    final String? dueRaw = _get<String>('dueDate', 'due_date');
+    final DateTime? dueDate = (dueRaw != null && dueRaw.isNotEmpty)
+        ? DateTime.parse(dueRaw)
+        : null;
+    final String? priority = _get<String>('priority', 'priority');
+    final String? categoryId = _get<String>('categoryId', 'category_id');
+    final String? createdRaw = _get<String>('createdAt', 'created_at');
+    final String? updatedRaw = _get<String>('updatedAt', 'updated_at');
+
     return Task(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String?,
-      isCompleted: json['isCompleted'] as bool,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
-          : null,
-      priority: json['priority'] as String?,
-      categoryId: json['categoryId'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
-          : null,
+      id: id,
+      title: title,
+      description: description,
+      isCompleted: isCompleted,
+      dueDate: dueDate,
+      priority: priority,
+      categoryId: categoryId,
+      createdAt: createdRaw != null ? DateTime.parse(createdRaw) : null,
+      updatedAt: updatedRaw != null ? DateTime.parse(updatedRaw) : null,
     );
   }
 

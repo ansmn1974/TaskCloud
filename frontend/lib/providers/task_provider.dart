@@ -17,6 +17,8 @@ class TaskProvider extends ChangeNotifier {
   final StorageService _storage;
   final ApiService _api;
   final List<Task> _tasks = <Task>[];
+  // Map temporary/local ids to server-assigned ids
+  final Map<String, String> _idAlias = <String, String>{};
   bool _isLoading = false;
   String? _error;
   bool _isOnline = true;
@@ -96,6 +98,10 @@ class TaskProvider extends ChangeNotifier {
       // Replace local task with server version (has server-generated ID)
       final idx = _tasks.indexWhere((t) => t.id == task.id);
       if (idx != -1) {
+        // Keep an alias mapping so subsequent calls with the old id still work
+        if (createdTask.id != task.id) {
+          _idAlias[task.id] = createdTask.id;
+        }
         _tasks[idx] = createdTask;
         await _save();
       }
@@ -119,17 +125,29 @@ class TaskProvider extends ChangeNotifier {
 
   /// Updates an existing task with optimistic update.
   Future<void> updateTask(Task updated) async {
-    final idx = _tasks.indexWhere((t) => t.id == updated.id);
+    final effectiveId = _idAlias[updated.id] ?? updated.id;
+    final idx = _tasks.indexWhere((t) => t.id == effectiveId || t.id == updated.id);
     if (idx == -1) return;
 
     // Optimistic update
-    _tasks[idx] = updated.copyWith(updatedAt: DateTime.now());
+    _tasks[idx] = _tasks[idx].copyWith(
+      title: updated.title,
+      description: updated.description,
+      isCompleted: updated.isCompleted,
+      dueDate: updated.dueDate,
+      priority: updated.priority,
+      categoryId: updated.categoryId,
+      updatedAt: DateTime.now(),
+    );
     await _save();
     notifyListeners();
 
     try {
       // Sync with API
       final serverTask = await _api.updateTask(_tasks[idx]);
+      if (serverTask.id != _tasks[idx].id) {
+        _idAlias[_tasks[idx].id] = serverTask.id;
+      }
       _tasks[idx] = serverTask;
       await _save();
       _isOnline = true;
@@ -150,7 +168,8 @@ class TaskProvider extends ChangeNotifier {
 
   /// Toggles completion state with API sync.
   Future<void> toggleComplete(String id) async {
-    final idx = _tasks.indexWhere((t) => t.id == id);
+    final effectiveId = _idAlias[id] ?? id;
+    final idx = _tasks.indexWhere((t) => t.id == effectiveId || t.id == id);
     if (idx == -1) return;
 
     final t = _tasks[idx];
@@ -164,6 +183,9 @@ class TaskProvider extends ChangeNotifier {
     try {
       // Sync with API
       final serverTask = await _api.updateTask(updated);
+      if (serverTask.id != updated.id) {
+        _idAlias[updated.id] = serverTask.id;
+      }
       _tasks[idx] = serverTask;
       await _save();
       _isOnline = true;
@@ -184,7 +206,8 @@ class TaskProvider extends ChangeNotifier {
 
   /// Deletes task with API sync.
   Future<void> deleteTask(String id) async {
-    final idx = _tasks.indexWhere((t) => t.id == id);
+    final effectiveId = _idAlias[id] ?? id;
+    final idx = _tasks.indexWhere((t) => t.id == effectiveId || t.id == id);
     if (idx == -1) return;
 
     // Optimistic delete
@@ -194,7 +217,7 @@ class TaskProvider extends ChangeNotifier {
 
     try {
       // Sync with API
-      await _api.deleteTask(id);
+  await _api.deleteTask(effectiveId);
       _isOnline = true;
       _error = null;
     } catch (e) {
