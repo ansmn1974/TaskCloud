@@ -54,7 +54,10 @@ class TaskProvider extends ChangeNotifier {
       _tasks
         ..clear()
         ..addAll(localTasks);
-      _error = 'Using offline data. Check your internet connection.';
+      _error = 'Offline: ${e.toString()}';
+      if (kDebugMode) {
+        print('API connection error: $e');
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

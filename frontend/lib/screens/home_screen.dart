@@ -72,6 +72,30 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('TaskCloud'),
         actions: [
+          // Refresh/retry connection button
+          IconButton(
+            icon: provider.isLoading 
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh),
+            tooltip: 'Refresh and retry connection',
+            onPressed: provider.isLoading ? null : () async {
+              await provider.loadFromStorage();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(provider.isOnline 
+                        ? '✓ Connected to server' 
+                        : '✗ ${provider.error ?? "Connection failed"}'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+          ),
           // Connection status indicator
           if (provider.error != null)
             Tooltip(
