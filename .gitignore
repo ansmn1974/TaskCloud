@@ -1,0 +1,230 @@
+# ============================================
+# TaskCloud Root .gitignore
+# ============================================
+
+# ============================================
+# SECURITY: NEVER COMMIT THESE
+# ============================================
+
+# Environment files with real credentials
+.env
+.env.local
+.env.*.local
+.env.development
+.env.staging
+.env.production
+.env.test
+
+# API Keys and Secrets
+secrets/
+credentials/
+**/secrets.dart
+**/api_keys.dart
+**/secrets.py
+**/secrets.json
+
+# Certificates and Keys
+*.pem
+*.key
+*.p12
+*.keystore
+*.jks
+*.pfx
+*.cer
+*.crt
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+db.sqlite3
+
+# ============================================
+# Python / Django Backend
+# ============================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+backend/venv/
+backend/env/
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3-journal
+media/
+staticfiles/
+static_root/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.pytest_cache/
+
+# ============================================
+# Flutter / Dart Frontend
+# ============================================
+
+# See frontend/.gitignore for detailed Flutter ignores
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+frontend/coverage/
+
+# ============================================
+# IDE / Editor
+# ============================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+
+# ============================================
+# OS Files
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# Build Artifacts
+# ============================================
+
+# Compiled files (allow .exe and .dll inside build_artifacts for distribution)
+# *.exe
+# *.dll
+*.so
+*.dylib
+
+# Distribution files
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Build artifacts folder (packaged releases)
+**/build_artifacts/
+
+# ============================================
+# Testing & Reports
+# ============================================
+
+# Test coverage
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+*.lcov
+
+# Reports
+reports/
+test-results/
+
+# ============================================
+# Documentation
+# ============================================
+
+# Generated docs
+docs/_build/
+site/
+.doctrees/
+
+# ============================================
+# Temporary & Cache Files
+# ============================================
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.bak
+*.backup
+*.old
+
+# ============================================
+# Logs
+# ============================================
+
+*.log
+logs/
+*.log.*
+
+# ============================================
+# Node modules (if using any Node tools)
+# ============================================
+
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ============================================
+# WIP / Development Only Files
+# ============================================
+
+# Work in progress
+WIP_*
+TODO_DELETE_*
+TEMP_*
+DRAFT_*
+scratch.*
+notes.txt
+TODO_PERSONAL.md
+
+# ============================================
+# Deployment
+# ============================================
+
+# Docker
+.dockerignore
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# CI/CD secrets
+.github/secrets/

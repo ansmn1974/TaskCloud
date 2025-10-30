@@ -1,0 +1,211 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Coverage - NEVER commit coverage files
+/coverage/
+*.lcov
+*.info
+test/.test_coverage.dart
+coverage_badge.svg
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# iOS related
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# ============================================
+# SECURITY: NEVER COMMIT THESE FILES
+# ============================================
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+.env.development
+.env.staging
+.env.production
+.env.test
+
+# API Keys and Credentials
+**/secrets.dart
+**/api_keys.dart
+**/config/secrets.dart
+**/config/api_keys.dart
+secrets/
+credentials/
+
+# Firebase configuration files (contain sensitive data)
+**/google-services.json
+**/GoogleService-Info.plist
+firebase_options.dart
+firebase_app_id_file.json
+
+# Authentication tokens and certificates
+*.pem
+*.key
+*.p12
+*.keystore
+*.jks
+android/key.properties
+android/app/upload-keystore.jks
+ios/Runner/GoogleService-Info.plist
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Local configuration files
+local.properties
+local_config.dart
+
+# ============================================
+# DEVELOPMENT & TESTING
+# ============================================
+
+# Test artifacts
+test_driver/
+integration_test/screenshots/
+*.profraw
+
+# Debug files
+*.dSYM/
+*.dSYM.zip
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.fuse_hidden*
+
+# OS-specific files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Spotlight-V100
+.Trashes
+
+# ============================================
+# BUILD & DISTRIBUTION
+# ============================================
+
+# Compiled files
+*.exe
+*.dll
+*.so
+*.dylib
+*.app
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# APK files (don't commit built APKs to repo)
+*.apk
+*.aab
+*.ipa
+
+# ============================================
+# DOCUMENTATION & REPORTS
+# ============================================
+
+# Generated documentation
+doc/api/
+docs/_build/
+site/
+
+# Reports
+reports/
+*.html.dart
+analysis_options.yaml.bak
+
+# ============================================
+# NEVER PUSH TO MAIN/MASTER
+# ============================================
+# These patterns help prevent accidental commits of WIP code
+
+# Work in progress markers
+**/WIP_*
+**/TODO_DELETE_*
+**/TEMP_*
+**/DRAFT_*
+
+# Backup files
+*.bak
+*.backup
+*.old
+*_backup.*
+
+# Personal notes (that shouldn't be in repo)
+NOTES.txt
+TODO_PERSONAL.md
+scratch.dart

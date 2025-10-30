@@ -1,0 +1,34 @@
+{
+	# Optional: email used for ACME/HTTPS when domain is configured
+	email {$CADDY_EMAIL}
+}
+
+# Production host (set CADDY_DOMAIN env var to your domain)
+{$CADDY_DOMAIN} {
+	encode gzip zstd
+
+	@static path /static/*
+	handle @static {
+		root * /app/staticfiles
+		file_server
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:8000
+	}
+}
+
+# Local development fallback (no TLS): http://localhost:8080
+:8080 {
+	encode gzip zstd
+
+	@static path /static/*
+	handle @static {
+		root * /app/staticfiles
+		file_server
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:8000
+	}
+}

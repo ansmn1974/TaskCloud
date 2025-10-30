@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+env/
+.venv/
+venv/
+ENV/
+
+# Environment files
+.env
+.env.*
+
+# Django / SQLite
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Coverage / test / caches
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# IDE / tooling
+.vscode/
+.idea/
+*.iml
+
+# Build
+build/
+dist/
+*.egg-info/
