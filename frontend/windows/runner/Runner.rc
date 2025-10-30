@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.ibnnabil" "\0"
-            VALUE "FileDescription", "taskcloud" "\0"
+            VALUE "FileDescription", "TaskCloud" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "taskcloud" "\0"
+            VALUE "InternalName", "TaskCloud" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.ibnnabil. All rights reserved." "\0"
-            VALUE "OriginalFilename", "taskcloud.exe" "\0"
-            VALUE "ProductName", "taskcloud" "\0"
+            VALUE "OriginalFilename", "TaskCloud.exe" "\0"
+            VALUE "ProductName", "TaskCloud" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

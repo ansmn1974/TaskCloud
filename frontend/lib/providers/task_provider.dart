@@ -31,30 +31,44 @@ class TaskProvider extends ChangeNotifier {
   bool get isOnline => _isOnline;
 
   /// Loads tasks from both API and local storage.
-  /// Tries API first, falls back to local storage if offline.
+  /// Tries API first, merges with local storage to preserve unsaved changes.
   Future<void> loadFromStorage() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
+    // Always load from local storage first
+    final localTasks = await _storage.loadTasks();
+
     try {
       // Try to fetch from API
       final apiTasks = await _api.fetchTasks();
+      
+      // Merge: prefer API tasks, but keep local tasks not in API
+      final Map<String, Task> taskMap = {for (var t in localTasks) t.id: t};
+      for (var apiTask in apiTasks) {
+        taskMap[apiTask.id] = apiTask; // API version takes precedence
+      }
+      
       _tasks
         ..clear()
-        ..addAll(apiTasks);
+        ..addAll(taskMap.values);
       _isOnline = true;
+      _error = null;
       
-      // Save to local storage for offline access
+      // Save merged result to local storage
       await _storage.saveTasks(_tasks);
+      
+      if (kDebugMode) {
+        print('Loaded ${apiTasks.length} tasks from server, ${_tasks.length} total after merge');
+      }
     } catch (e) {
-      // Fallback to local storage if API fails
+      // Use local storage if API fails
       _isOnline = false;
-      final localTasks = await _storage.loadTasks();
       _tasks
         ..clear()
         ..addAll(localTasks);
-      _error = 'Offline: ${e.toString()}';
+      _error = 'Offline: Using local data';
       if (kDebugMode) {
         print('API connection error: $e');
       }
@@ -72,27 +86,35 @@ class TaskProvider extends ChangeNotifier {
   Future<void> addTask(Task task) async {
     // Optimistic update
     _tasks.add(task);
+    await _save();
     notifyListeners();
 
     try {
       // Sync with API
       final createdTask = await _api.createTask(task);
       
-      // Replace local task with server version (has server-generated ID if needed)
+      // Replace local task with server version (has server-generated ID)
       final idx = _tasks.indexWhere((t) => t.id == task.id);
       if (idx != -1) {
         _tasks[idx] = createdTask;
+        await _save();
       }
-      await _save();
-      _isOnline = true;
-      _error = null;
+      // Don't change connection status - maintain current state
+      if (kDebugMode) {
+        print('Task created successfully on server: ${createdTask.id}');
+      }
     } catch (e) {
-      // Keep local task even if API fails
-      _isOnline = false;
-      _error = 'Task saved locally. Will sync when online.';
-      await _save();
+      // Task is already saved locally, just log the error
+      if (kDebugMode) {
+        print('Failed to sync task to server: $e');
+      }
+      // Only set offline if we weren't already offline
+      if (_isOnline) {
+        _isOnline = false;
+        _error = 'Task saved locally. Will sync when online.';
+        notifyListeners();
+      }
     }
-    notifyListeners();
   }
 
   /// Updates an existing task with optimistic update.
@@ -101,8 +123,8 @@ class TaskProvider extends ChangeNotifier {
     if (idx == -1) return;
 
     // Optimistic update
-    final oldTask = _tasks[idx];
     _tasks[idx] = updated.copyWith(updatedAt: DateTime.now());
+    await _save();
     notifyListeners();
 
     try {
@@ -110,16 +132,20 @@ class TaskProvider extends ChangeNotifier {
       final serverTask = await _api.updateTask(_tasks[idx]);
       _tasks[idx] = serverTask;
       await _save();
-      _isOnline = true;
-      _error = null;
+      if (kDebugMode) {
+        print('Task updated successfully on server: ${serverTask.id}');
+      }
     } catch (e) {
-      // Rollback on failure
-      _tasks[idx] = oldTask;
-      _isOnline = false;
-      _error = 'Failed to update task. Changes not saved.';
-      await _save();
+      // Keep the local change, just log the error
+      if (kDebugMode) {
+        print('Failed to sync task update to server: $e');
+      }
+      if (_isOnline) {
+        _isOnline = false;
+        _error = 'Changes saved locally. Will sync when online.';
+        notifyListeners();
+      }
     }
-    notifyListeners();
   }
 
   /// Toggles completion state with API sync.
@@ -132,6 +158,7 @@ class TaskProvider extends ChangeNotifier {
     
     // Optimistic update
     _tasks[idx] = updated;
+    await _save();
     notifyListeners();
 
     try {
@@ -139,16 +166,20 @@ class TaskProvider extends ChangeNotifier {
       final serverTask = await _api.updateTask(updated);
       _tasks[idx] = serverTask;
       await _save();
-      _isOnline = true;
-      _error = null;
+      if (kDebugMode) {
+        print('Task toggle synced successfully: ${serverTask.id}');
+      }
     } catch (e) {
-      // Rollback on failure
-      _tasks[idx] = t;
-      _isOnline = false;
-      _error = 'Failed to toggle task. Try again.';
-      await _save();
+      // Keep the local change, just log the error
+      if (kDebugMode) {
+        print('Failed to sync task toggle to server: $e');
+      }
+      if (_isOnline) {
+        _isOnline = false;
+        _error = 'Changes saved locally. Will sync when online.';
+        notifyListeners();
+      }
     }
-    notifyListeners();
   }
 
   /// Deletes task with API sync.

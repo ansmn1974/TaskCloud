@@ -43,13 +43,8 @@ urlpatterns = [
     path('health/', health_check, name='health'),
     path('admin/', admin.site.urls),
     path('api/tasks/', include('tasks.urls')),
-    # API documentation
+    # API documentation (available in production with throttling)
     path('api/schema/', ThrottledSchemaView.as_view(), name='schema'),
+    path('api/docs/', ThrottledSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', ThrottledRedocView.as_view(url_name='schema'), name='redoc'),
 ]
-
-if settings.DEBUG:
-    # Expose interactive docs only in DEBUG to avoid unnecessary public surface
-    urlpatterns += [
-        path('api/schema/swagger-ui/', ThrottledSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-        path('api/schema/redoc/', ThrottledRedocView.as_view(url_name='schema'), name='redoc'),
-    ]

@@ -1,0 +1,38 @@
+#!/bin/bash
+# Cron Setup Instructions for TaskCloud Auto-Delete
+# 
+# This script shows how to set up automatic task deletion every 10 minutes
+# on your Hostinger VPS
+
+echo "TaskCloud - Cron Job Setup for Auto-Delete Tasks"
+echo "================================================"
+echo ""
+echo "To set up automatic deletion of tasks older than 1 hour,"
+echo "follow these steps:"
+echo ""
+echo "1. SSH into your VPS:"
+echo "   ssh ansmn@72.61.16.177"
+echo ""
+echo "2. Edit your crontab:"
+echo "   crontab -e"
+echo ""
+echo "3. Add this line to run cleanup every 10 minutes:"
+echo "   */10 * * * * cd /home/ansmn/apps/TaskCloud/backend && docker-compose exec -T taskcloud python manage.py cleanup_expired_tasks >> /home/ansmn/apps/TaskCloud/logs/cleanup.log 2>&1"
+echo ""
+echo "4. Create logs directory if it doesn't exist:"
+echo "   mkdir -p /home/ansmn/apps/TaskCloud/logs"
+echo ""
+echo "5. Save and exit the crontab editor"
+echo ""
+echo "To test the command manually:"
+echo "   cd /home/ansmn/apps/TaskCloud/backend"
+echo "   docker-compose exec taskcloud python manage.py cleanup_expired_tasks --dry-run"
+echo ""
+echo "Cron schedule options:"
+echo "  */10 * * * *  = Every 10 minutes"
+echo "  */15 * * * *  = Every 15 minutes"
+echo "  */30 * * * *  = Every 30 minutes"
+echo "  0 * * * *     = Every hour (at minute 0)"
+echo ""
+echo "To view cron logs:"
+echo "   tail -f /home/ansmn/apps/TaskCloud/logs/cleanup.log"
