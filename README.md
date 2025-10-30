@@ -19,10 +19,8 @@ TaskCloud provides a seamless task management experience across all platforms. U
 
 ## Features
 
-- Cross-platform compatibility (iOS, Android, Web)
+- Cross-platform compatibility (Windows, Android, Web)
 - Real-time task synchronization
-- User authentication and authorization
-- Task categories and priorities
 - Due date reminders
 - Offline support with sync when online
 - Clean, intuitive user interface
